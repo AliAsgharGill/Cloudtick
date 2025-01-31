@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User";
+import { env } from "../config/env";
 
 const router = express.Router();
 
@@ -33,7 +34,7 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
+    const token = jwt.sign({ id: user._id }, env.JWT_SECRET as string, {
       expiresIn: "1h",
     });
 

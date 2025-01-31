@@ -1,23 +1,40 @@
 import express from "express";
-import mongoose from "mongoose";
-import dotenv from "dotenv";
 import cors from "cors";
+import connectDB from "./config/db";
+import { env } from "./config/env";
 import authRoutes from "./routes/auth";
 import todoRoutes from "./routes/todo";
+import errorHandler from "./middleware/errorHandler";
+import mongoose from "mongoose";
+import router from "./routes";
 
-dotenv.config();
 const app = express();
 
-app.use(express.json());
-app.use(cors());
-
-app.use("/api/auth", authRoutes);
-app.use("/api/todos", todoRoutes);
-
-mongoose
-  .connect(process.env.MONGO_URI as string)
-  .then(() => {
-    console.log("Connected to MongoDB");
-    app.listen(8080, () => console.log("Server running on port 8080"));
+app.use(errorHandler); // Must be after all route handlers
+// CORS Configuration
+app.use(
+  cors({
+    origin: env.CLIENT_URL, // Restrict to frontend domain
+    credentials: true, // Allow cookies, auth headers, etc.
   })
-  .catch((err) => console.error("Error connecting to MongoDB:", err));
+);
+
+app.use(express.json()); // Parse JSON body
+
+app.use(router); // Use routes from routes/index.ts
+
+// Connect to DB and Start Server
+connectDB().then(() => {
+  app.listen(env.PORT, () =>
+    console.log(
+      `Server running in ${env.NODE_ENV} mode on http://localhost:${env.PORT}`
+    )
+  );
+});
+
+process.on("SIGINT", async () => {
+  console.log("🛑 Closing server...");
+  await mongoose.connection.close();
+  console.log("✅ MongoDB Connection Closed.");
+  process.exit(0);
+});
