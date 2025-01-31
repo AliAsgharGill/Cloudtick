@@ -14,7 +14,7 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
     await newUser.save();
     res.status(201).json({ message: "User registered" });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error occurred while registering user" });
   }
 });
 
@@ -24,13 +24,13 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      res.status(400).json({ message: "Invalid credentials" });
+      res.status(400).json({ message: "User not found with this email" });
       return;
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      res.status(400).json({ message: "Invalid credentials" });
+      res.status(400).json({ message: "Invalid Password" });
       return;
     }
 
@@ -40,7 +40,7 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
 
     res.json({ token, userId: user._id });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error occurred while logging in" });
   }
 });
 

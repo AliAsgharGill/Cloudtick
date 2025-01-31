@@ -2,8 +2,6 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./config/db";
 import { env } from "./config/env";
-import authRoutes from "./routes/auth";
-import todoRoutes from "./routes/todo";
 import errorHandler from "./middleware/errorHandler";
 import mongoose from "mongoose";
 import router from "./routes";
